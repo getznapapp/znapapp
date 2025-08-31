@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Invite Links - Znap</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #6366f1;
+        }
+        
+        h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 30px 0 15px 0;
+            color: #ffffff;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            color: #a0a0a0;
+        }
+        
+        .test-link {
+            display: inline-block;
+            background: #6366f1;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 10px 10px 10px 0;
+            transition: background 0.2s;
+        }
+        
+        .test-link:hover {
+            background: #5855eb;
+        }
+        
+        .status {
+            background: #111;
+            border-left: 4px solid #6366f1;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .success {
+            border-left-color: #10b981;
+        }
+        
+        .error {
+            border-left-color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 Invite Link Test</h1>
+        
+        <p>Test the invite link functionality. These links should work in any browser, including Safari, Chrome, and social media apps like Messenger.</p>
+        
+        <h2>Test Invite Links:</h2>
+        <p>Click these to test the redirect functionality:</p>
+        
+        <a href="/redirect?cameraId=test123" class="test-link">
+            📱 Test Camera (ID: test123)
+        </a>
+        
+        <a href="/redirect?cameraId=demo456" class="test-link">
+            📱 Demo Camera (ID: demo456)
+        </a>
+        
+        <a href="/redirect?cameraId=party789" class="test-link">
+            📱 Party Camera (ID: party789)
+        </a>
+        
+        <h2>Expected Behavior:</h2>
+        <div class="status">
+            <p><strong>If you have the Znap app installed:</strong></p>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>The app should open directly to the join screen</li>
+                <li>You'll see the camera join interface</li>
+            </ul>
+        </div>
+        
+        <div class="status">
+            <p><strong>If you don't have the app installed:</strong></p>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>You'll see a "Open in App" button</li>
+                <li>After 2.5 seconds, you'll be redirected to the web version</li>
+                <li>The web version will show the camera join interface</li>
+            </ul>
+        </div>
+        
+        <h2>Share These Links:</h2>
+        <p>Copy and paste these URLs to test in different apps:</p>
+        
+        <div style="background: #1a1a1a; border: 1px solid #333; border-radius: 6px; padding: 15px; font-family: monospace; font-size: 14px; margin: 15px 0;">
+            <div id="currentDomain"></div>/redirect?cameraId=test123<br>
+            <div id="currentDomain2"></div>/redirect?cameraId=demo456<br>
+            <div id="currentDomain3"></div>/redirect?cameraId=party789
+        </div>
+        
+        <p><strong>Test in:</strong> Safari, Chrome, Messenger, Instagram, WhatsApp, Telegram, etc.</p>
+    </div>
+
+    <script>
+        // Fill in the current domain
+        const domain = window.location.origin;
+        document.getElementById('currentDomain').textContent = domain;
+        document.getElementById('currentDomain2').textContent = domain;
+        document.getElementById('currentDomain3').textContent = domain;
+    </script>
+</body>
+</html>

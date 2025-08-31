@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Znap - Opening...</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 300px;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            color: #a0a0a0;
+            line-height: 1.4;
+            margin-bottom: 32px;
+        }
+        
+        .button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 16px;
+            min-width: 200px;
+            transition: background 0.2s;
+        }
+        
+        .button:hover {
+            background: #5855eb;
+        }
+        
+        .button:active {
+            transform: scale(0.98);
+        }
+        
+        .web-button {
+            background: transparent;
+            color: #a0a0a0;
+            border: 1px solid #333;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .web-button:hover {
+            border-color: #555;
+            color: #ccc;
+        }
+        
+        .loader {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #6366f1;
+            opacity: 0.6;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .debug {
+            font-size: 12px;
+            opacity: 0.5;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title" id="title">Loading Znap...</h1>
+        <p class="subtitle" id="subtitle">
+            Please wait while we load the app.
+        </p>
+        
+        <div id="buttons" class="hidden">
+            <button class="button" onclick="handleOpenApp()">Open in App</button>
+            <button class="web-button" onclick="openInBrowser()">Continue in Browser</button>
+        </div>
+        
+        <div class="loader" id="loader">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+        
+        <div class="debug">
+            <div>URL: <span id="debug-url"></span></div>
+            <div>Route: <span id="debug-route"></span></div>
+            <div>Camera ID: <span id="debug-camera-id"></span></div>
+        </div>
+    </div>
+
+    <script>
+        // Debug info
+        document.getElementById('debug-url').textContent = window.location.href;
+        document.getElementById('debug-route').textContent = window.location.pathname;
+        
+        // Get cameraId from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const cameraId = urlParams.get('cameraId');
+        document.getElementById('debug-camera-id').textContent = cameraId || 'None';
+        
+        console.log('=== FALLBACK INDEX PAGE DEBUG ===');
+        console.log('Current URL:', window.location.href);
+        console.log('Pathname:', window.location.pathname);
+        console.log('Search params:', window.location.search);
+        console.log('Camera ID:', cameraId);
+        
+        // Check if this is a redirect route
+        if (window.location.pathname === '/redirect' && cameraId) {
+            // This is a redirect page - show the redirect UI
+            document.getElementById('title').textContent = 'Open this event in the Znap app';
+            document.getElementById('subtitle').textContent = 'Tap the button below to open the event in the Znap app.';
+            document.getElementById('loader').classList.add('hidden');
+            document.getElementById('buttons').classList.remove('hidden');
+        } else if (window.location.pathname.startsWith('/join/')) {
+            // This is a join page - redirect to the actual join route
+            const pathParts = window.location.pathname.split('/');
+            const joinCameraId = pathParts[2];
+            if (joinCameraId) {
+                document.getElementById('title').textContent = 'Joining event...';
+                document.getElementById('subtitle').textContent = 'Redirecting you to the event.';
+                // Redirect to the actual app route
+                setTimeout(() => {
+                    window.location.href = `/join/${joinCameraId}${window.location.search}`;
+                }, 1000);
+            }
+        } else {
+            // Default loading state - try to load the actual React app
+            setTimeout(() => {
+                // If we're still here after 3 seconds, show an error
+                document.getElementById('title').textContent = 'Unable to load app';
+                document.getElementById('subtitle').textContent = 'Please check your internet connection and try again.';
+                document.getElementById('loader').classList.add('hidden');
+                
+                // Add a retry button
+                const retryButton = document.createElement('button');
+                retryButton.className = 'button';
+                retryButton.textContent = 'Retry';
+                retryButton.onclick = () => window.location.reload();
+                document.querySelector('.container').appendChild(retryButton);
+            }, 3000);
+        }
+        
+        function handleOpenApp() {
+            if (!cameraId) return;
+            
+            // Update UI to show loading state
+            document.getElementById('buttons').classList.add('hidden');
+            document.getElementById('loader').classList.remove('hidden');
+            document.getElementById('subtitle').textContent = "Opening app... If it doesn't open, you'll be redirected to the web version.";
+            
+            const deepLinkUrl = `myapp://join?cameraId=${cameraId}`;
+            const fallbackUrl = `/join/${cameraId}`;
+            
+            // Function to try opening the app
+            function tryOpenApp() {
+                // Method 1: Create hidden iframe
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = deepLinkUrl;
+                document.body.appendChild(iframe);
+                
+                // Clean up iframe
+                setTimeout(() => {
+                    if (document.body.contains(iframe)) {
+                        document.body.removeChild(iframe);
+                    }
+                }, 100);
+                
+                // Method 2: Try direct navigation
+                setTimeout(() => {
+                    try {
+                        window.location.href = deepLinkUrl;
+                    } catch (error) {
+                        console.log('Deep link attempt failed:', error);
+                    }
+                }, 500);
+            }
+            
+            // Set up fallback timer
+            const fallbackTimer = setTimeout(() => {
+                window.location.href = fallbackUrl;
+            }, 2500); // 2.5 second timeout
+            
+            // Listen for page visibility change (indicates app opened)
+            function handleVisibilityChange() {
+                if (document.hidden) {
+                    // Page became hidden, likely app opened
+                    clearTimeout(fallbackTimer);
+                }
+            }
+            
+            // Listen for blur event (another indicator app might have opened)
+            function handleBlur() {
+                clearTimeout(fallbackTimer);
+            }
+            
+            // Add event listeners
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+            window.addEventListener('blur', handleBlur);
+            window.addEventListener('pagehide', handleBlur);
+            
+            // Try to open the app
+            tryOpenApp();
+            
+            // Cleanup after timeout
+            setTimeout(() => {
+                document.removeEventListener('visibilitychange', handleVisibilityChange);
+                window.removeEventListener('blur', handleBlur);
+                window.removeEventListener('pagehide', handleBlur);
+            }, 3000);
+        }
+        
+        function openInBrowser() {
+            if (cameraId) {
+                window.location.href = `/join/${cameraId}`;
+            }
+        }
+    </script>
+</body>
+</html>

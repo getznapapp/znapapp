@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Znap - Routing Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #6366f1;
+        }
+        
+        .section {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .section h3 {
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+        
+        .info {
+            color: #a0a0a0;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .test-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .test-link {
+            background: #6366f1;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            text-align: center;
+            transition: background 0.2s;
+        }
+        
+        .test-link:hover {
+            background: #5855eb;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .status.success {
+            background: #065f46;
+            color: #10b981;
+        }
+        
+        .status.error {
+            background: #7f1d1d;
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">🧪 Znap Routing Test</h1>
+        
+        <div class="section">
+            <h3>Current Page Info</h3>
+            <div class="info">URL: <span id="current-url"></span></div>
+            <div class="info">Pathname: <span id="current-pathname"></span></div>
+            <div class="info">Search: <span id="current-search"></span></div>
+            <div class="info">User Agent: <span id="user-agent"></span></div>
+        </div>
+        
+        <div class="section">
+            <h3>Test Links</h3>
+            <p style="color: #a0a0a0; margin-bottom: 15px;">
+                Click these links to test if routing works correctly:
+            </p>
+            <div class="test-links">
+                <a href="/redirect?cameraId=test123" class="test-link">
+                    Test /redirect?cameraId=test123
+                </a>
+                <a href="/redirect.html?cameraId=test456" class="test-link">
+                    Test /redirect.html?cameraId=test456
+                </a>
+                <a href="/join/test789" class="test-link">
+                    Test /join/test789
+                </a>
+                <a href="/" class="test-link">
+                    Test / (Home)
+                </a>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>Routing Status</h3>
+            <div id="routing-status">Checking...</div>
+        </div>
+    </div>
+
+    <script>
+        // Update current page info
+        document.getElementById('current-url').textContent = window.location.href;
+        document.getElementById('current-pathname').textContent = window.location.pathname;
+        document.getElementById('current-search').textContent = window.location.search || '(none)';
+        document.getElementById('user-agent').textContent = navigator.userAgent;
+        
+        // Test routing status
+        function checkRoutingStatus() {
+            const statusDiv = document.getElementById('routing-status');
+            
+            // Test if we can access the main app
+            fetch('/')
+                .then(response => {
+                    if (response.ok) {
+                        statusDiv.innerHTML = '<div class="status success">✅ Main app accessible</div>';
+                        
+                        // Test redirect route
+                        return fetch('/redirect?cameraId=test');
+                    } else {
+                        throw new Error('Main app not accessible');
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        statusDiv.innerHTML += '<div class="status success">✅ Redirect route accessible</div>';
+                    } else {
+                        statusDiv.innerHTML += '<div class="status error">❌ Redirect route not accessible</div>';
+                    }
+                })
+                .catch(error => {
+                    statusDiv.innerHTML = '<div class="status error">❌ Routing test failed: ' + error.message + '</div>';
+                });
+        }
+        
+        // Run the test
+        checkRoutingStatus();
+        
+        console.log('=== ROUTING TEST PAGE ===');
+        console.log('Current URL:', window.location.href);
+        console.log('Testing routing configuration...');
+    </script>
+</body>
+</html>

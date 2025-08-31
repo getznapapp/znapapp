@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Join Znap Camera</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .icon {
+            width: 80px;
+            height: 80px;
+            background: #1a1a1a;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            border: 1px solid #374151;
+            font-size: 32px;
+        }
+        
+        .title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            color: #94a3b8;
+            margin-bottom: 32px;
+            line-height: 1.4;
+        }
+        
+        .camera-id-display {
+            background: #1a1a1a;
+            border: 1px solid #374151;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .camera-id-label {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+        
+        .camera-id-value {
+            font-size: 18px;
+            font-weight: 600;
+            font-family: monospace;
+            color: #6366f1;
+        }
+        
+        .form {
+            margin-bottom: 32px;
+        }
+        
+        .input-group {
+            margin-bottom: 24px;
+            text-align: left;
+        }
+        
+        .label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .input {
+            width: 100%;
+            background: #1a1a1a;
+            border: 1px solid #374151;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 16px;
+            color: #ffffff;
+        }
+        
+        .input:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+        
+        .input::placeholder {
+            color: #6b7280;
+        }
+        
+        .button {
+            background: #6366f1;
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+        
+        .button:hover {
+            background: #5855eb;
+        }
+        
+        .button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .button-secondary {
+            background: transparent;
+            border: 1px solid #374151;
+            color: #94a3b8;
+            font-weight: 500;
+            margin-top: 16px;
+        }
+        
+        .button-secondary:hover {
+            background: #1f2937;
+            color: white;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+            gap: 16px;
+        }
+        
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: #374151;
+        }
+        
+        .divider-text {
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
+        .info-box {
+            background: #1a1a1a;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 24px;
+            font-size: 14px;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+        
+        .disclaimer {
+            font-size: 12px;
+            color: #6b7280;
+            text-align: center;
+            margin-top: 16px;
+            line-height: 1.4;
+        }
+        
+        .error {
+            color: #ef4444;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        
+        .success {
+            color: #10b981;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        
+        .loading {
+            display: none;
+        }
+        
+        .loading-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #6366f1;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">
+            📷
+        </div>
+        
+        <h1 class="title">Join Camera</h1>
+        <p class="subtitle" id="subtitle">
+            Enter your name to join this camera and start taking photos with others
+        </p>
+        
+        <div class="camera-id-display" id="cameraIdDisplay" style="display: none;">
+            <div class="camera-id-label">Camera ID:</div>
+            <div class="camera-id-value" id="cameraIdValue"></div>
+        </div>
+        
+        <form class="form" id="joinForm">
+            <div class="input-group" id="cameraIdGroup">
+                <label class="label" for="cameraIdInput">Camera ID</label>
+                <input 
+                    type="text" 
+                    id="cameraIdInput" 
+                    class="input" 
+                    placeholder="Enter Camera ID"
+                    required
+                />
+            </div>
+            
+            <div class="input-group">
+                <label class="label" for="guestNameInput">Your Name</label>
+                <input 
+                    type="text" 
+                    id="guestNameInput" 
+                    class="input" 
+                    placeholder="Enter your name"
+                    required
+                />
+            </div>
+            
+            <div class="divider">
+                <div class="divider-line"></div>
+                <span class="divider-text">OR</span>
+                <div class="divider-line"></div>
+            </div>
+            
+            <button type="button" class="button button-secondary" onclick="generateRandomName()">
+                Generate Random Guest ID
+            </button>
+            
+            <div class="info-box">
+                Your name will be visible to other participants when you take photos
+            </div>
+            
+            <button type="submit" class="button" id="joinButton">
+                Join Camera
+            </button>
+            
+            <div class="loading" id="loading">
+                <div>Joining camera...</div>
+                <div class="loading-dots">
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                </div>
+            </div>
+            
+            <div id="message"></div>
+        </form>
+        
+        <div class="disclaimer">
+            By joining, you agree to share photos with other participants
+        </div>
+    </div>
+
+    <script>
+        // Get camera ID from URL path or query params
+        let cameraId = '';
+        
+        // Try to get from path: /join/CAMERA_ID
+        const pathParts = window.location.pathname.split('/');
+        if (pathParts.length >= 3 && pathParts[1] === 'join') {
+            cameraId = decodeURIComponent(pathParts[2]);
+        }
+        
+        // Fallback to query params: ?cameraId=CAMERA_ID
+        if (!cameraId) {
+            const urlParams = new URLSearchParams(window.location.search);
+            cameraId = urlParams.get('cameraId') || '';
+        }
+        
+        console.log('=== STATIC JOIN PAGE ===');
+        console.log('Camera ID:', cameraId);
+        console.log('Full URL:', window.location.href);
+        
+        // Initialize the page
+        if (cameraId) {
+            document.getElementById('cameraIdValue').textContent = cameraId;
+            document.getElementById('cameraIdDisplay').style.display = 'block';
+            document.getElementById('cameraIdGroup').style.display = 'none';
+            document.getElementById('cameraIdInput').value = cameraId;
+        }
+        
+        // Generate random guest name
+        function generateRandomName() {
+            const adjectives = ['Happy', 'Cool', 'Awesome', 'Fun', 'Creative', 'Bright', 'Swift', 'Bold'];
+            const nouns = ['Photographer', 'Snapper', 'Shooter', 'Artist', 'Creator', 'Explorer', 'Adventurer', 'Friend'];
+            
+            const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+            const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
+            const randomNumber = Math.floor(Math.random() * 100);
+            
+            const generatedName = `${randomAdjective}${randomNoun}${randomNumber}`;
+            document.getElementById('guestNameInput').value = generatedName;
+        }
+        
+        // Handle form submission
+        document.getElementById('joinForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const finalCameraId = document.getElementById('cameraIdInput').value.trim();
+            const guestName = document.getElementById('guestNameInput').value.trim();
+            
+            if (!finalCameraId || !guestName) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+            
+            // Show loading state
+            document.getElementById('joinButton').disabled = true;
+            document.getElementById('loading').style.display = 'block';
+            showMessage('Opening app...', 'success');
+            
+            // Try to open the app directly with the camera ID and guest name
+            setTimeout(() => {
+                const deepLinkUrl = `myapp://join-camera?cameraId=${encodeURIComponent(finalCameraId)}&guestName=${encodeURIComponent(guestName)}`;
+                
+                console.log('Attempting to open app with URL:', deepLinkUrl);
+                
+                // Method 1: Try with iframe
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = deepLinkUrl;
+                document.body.appendChild(iframe);
+                
+                setTimeout(() => {
+                    if (document.body.contains(iframe)) {
+                        document.body.removeChild(iframe);
+                    }
+                }, 100);
+                
+                // Method 2: Try with window.location
+                setTimeout(() => {
+                    try {
+                        window.location.href = deepLinkUrl;
+                    } catch (error) {
+                        console.log('Deep link failed:', error);
+                    }
+                }, 500);
+                
+                // Show success message and instructions
+                setTimeout(() => {
+                    showMessage(`Ready to join! If you have the Znap app installed, it should open automatically. Otherwise, please:
+
+1. Open the Znap app manually
+2. Tap "Join Camera"
+3. Enter Camera ID: ${finalCameraId}
+4. Enter your name: ${guestName}`, 'success');
+                    
+                    document.getElementById('joinButton').disabled = false;
+                    document.getElementById('loading').style.display = 'none';
+                }, 2000);
+            }, 500);
+        });
+        
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = type;
+        }
+    </script>
+</body>
+</html>

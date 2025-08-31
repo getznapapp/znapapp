@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Test URL Generation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .test-result {
+            background: #1a1a1a;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        .test-result h3 {
+            color: #6366f1;
+            margin-bottom: 8px;
+        }
+        .url {
+            font-family: monospace;
+            background: #0a0a0a;
+            padding: 8px;
+            border-radius: 4px;
+            word-break: break-all;
+        }
+        button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 8px 8px 8px 0;
+        }
+        button:hover {
+            background: #5855eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>URL Generation Test</h1>
+        <p>This page tests the invite URL generation logic to ensure it works correctly in different environments.</p>
+        
+        <button onclick="testUrlGeneration()">Test URL Generation</button>
+        <button onclick="testWithCameraId()">Test with Sample Camera ID</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Copy the URL generation logic from deep-links.ts
+        function generateInviteUrl(cameraId, baseUrl) {
+            // Always use production URL for invite links to ensure they work across all environments
+            if (!baseUrl) {
+                // Always use production Netlify URL for sharing
+                baseUrl = 'https://znapapp.netlify.app';
+            }
+            return `${baseUrl}/camera?id=${encodeURIComponent(cameraId)}`;
+        }
+
+        function testUrlGeneration() {
+            const testCameraId = 'camera_1752757827131_ZY6KJ7';
+            const results = document.getElementById('results');
+            
+            results.innerHTML = `
+                <div class="test-result">
+                    <h3>Current Environment</h3>
+                    <p><strong>Hostname:</strong> ${window.location.hostname}</p>
+                    <p><strong>Full URL:</strong> ${window.location.href}</p>
+                    <p><strong>Protocol:</strong> ${window.location.protocol}</p>
+                    <p><strong>Port:</strong> ${window.location.port}</p>
+                </div>
+                
+                <div class="test-result">
+                    <h3>Development Detection</h3>
+                    <p><strong>Is Development:</strong> ${
+                        window.location.hostname === 'localhost' || 
+                        window.location.hostname === '127.0.0.1' ||
+                        window.location.hostname.includes('192.168.') ||
+                        window.location.hostname.includes('10.0.') ||
+                        window.location.hostname.includes('172.') ||
+                        window.location.hostname.includes('exp.direct') ||
+                        window.location.hostname.includes('ngrok') ||
+                        window.location.hostname.includes('tunnel')
+                    }</p>
+                </div>
+                
+                <div class="test-result">
+                    <h3>Generated Invite URL</h3>
+                    <div class="url">${generateInviteUrl(testCameraId)}</div>
+                </div>
+                
+                <div class="test-result">
+                    <h3>Test Links</h3>
+                    <p><a href="${generateInviteUrl(testCameraId)}" target="_blank" style="color: #6366f1;">Test Generated URL</a></p>
+                    <p><a href="https://znapapp.netlify.app/camera?id=${testCameraId}" target="_blank" style="color: #6366f1;">Direct Production URL</a></p>
+                </div>
+            `;
+        }
+
+        function testWithCameraId() {
+            const cameraId = prompt('Enter a camera ID to test:');
+            if (cameraId) {
+                const inviteUrl = generateInviteUrl(cameraId);
+                const results = document.getElementById('results');
+                results.innerHTML = `
+                    <div class="test-result">
+                        <h3>Custom Camera ID Test</h3>
+                        <p><strong>Camera ID:</strong> ${cameraId}</p>
+                        <p><strong>Generated URL:</strong></p>
+                        <div class="url">${inviteUrl}</div>
+                        <p><a href="${inviteUrl}" target="_blank" style="color: #6366f1;">Test This URL</a></p>
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-run test on page load
+        window.addEventListener('load', testUrlGeneration);
+    </script>
+</body>
+</html>

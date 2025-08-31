@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+            min-width: 200px;
+        }
+        button:hover {
+            background: #0056CC;
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        .debug-info {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .success {
+            color: #4CAF50;
+        }
+        .error {
+            color: #f44336;
+        }
+        video {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Camera Permission Test</h1>
+        <p>This page tests camera access directly in the browser</p>
+        
+        <div class="debug-info">
+            <h3>Browser Info:</h3>
+            <p><strong>User Agent:</strong> <span id="userAgent"></span></p>
+            <p><strong>Protocol:</strong> <span id="protocol"></span></p>
+            <p><strong>Host:</strong> <span id="host"></span></p>
+            <p><strong>MediaDevices Support:</strong> <span id="mediaDevices"></span></p>
+            <p><strong>getUserMedia Support:</strong> <span id="getUserMedia"></span></p>
+        </div>
+        
+        <button onclick="testCameraAccess()" id="testBtn">Test Camera Access</button>
+        <button onclick="stopCamera()" id="stopBtn" disabled>Stop Camera</button>
+        
+        <div id="result"></div>
+        <video id="video" autoplay playsinline style="display: none;"></video>
+    </div>
+
+    <script>
+        let currentStream = null;
+        
+        // Display browser info
+        document.getElementById('userAgent').textContent = navigator.userAgent;
+        document.getElementById('protocol').textContent = window.location.protocol;
+        document.getElementById('host').textContent = window.location.hostname;
+        document.getElementById('mediaDevices').textContent = navigator.mediaDevices ? '✓ Available' : '✗ Not Available';
+        document.getElementById('getUserMedia').textContent = navigator.mediaDevices?.getUserMedia ? '✓ Available' : '✗ Not Available';
+        
+        async function testCameraAccess() {
+            const testBtn = document.getElementById('testBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const result = document.getElementById('result');
+            const video = document.getElementById('video');
+            
+            testBtn.disabled = true;
+            testBtn.textContent = 'Testing...';
+            result.innerHTML = '<p>Requesting camera access...</p>';
+            
+            try {
+                console.log('=== CAMERA TEST START ===');
+                console.log('Location:', window.location.href);
+                console.log('Protocol:', window.location.protocol);
+                console.log('User Agent:', navigator.userAgent);
+                
+                if (!navigator.mediaDevices?.getUserMedia) {
+                    throw new Error('getUserMedia not supported');
+                }
+                
+                console.log('Requesting camera stream...');
+                
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: 'environment'
+                    }
+                });
+                
+                console.log('SUCCESS: Stream obtained');
+                console.log('Stream active:', stream.active);
+                console.log('Video tracks:', stream.getVideoTracks().length);
+                
+                // Display stream info
+                const tracks = stream.getVideoTracks();
+                let trackInfo = '';
+                tracks.forEach((track, index) => {
+                    trackInfo += `<p><strong>Track ${index}:</strong> ${track.label} (${track.kind})</p>`;
+                    console.log(`Track ${index}:`, {
+                        kind: track.kind,
+                        label: track.label,
+                        enabled: track.enabled,
+                        readyState: track.readyState
+                    });
+                });
+                
+                result.innerHTML = `
+                    <div class="success">
+                        <h3>✓ Camera Access Successful!</h3>
+                        <p>Stream active: ${stream.active}</p>
+                        <p>Video tracks: ${tracks.length}</p>
+                        ${trackInfo}
+                    </div>
+                `;
+                
+                // Show video
+                video.srcObject = stream;
+                video.style.display = 'block';
+                currentStream = stream;
+                
+                testBtn.textContent = 'Test Camera Access';
+                stopBtn.disabled = false;
+                
+            } catch (error) {
+                console.error('Camera test failed:', error);
+                
+                result.innerHTML = `
+                    <div class="error">
+                        <h3>✗ Camera Access Failed</h3>
+                        <p><strong>Error:</strong> ${error.name || 'Unknown'}</p>
+                        <p><strong>Message:</strong> ${error.message || 'No message'}</p>
+                        <p><strong>Possible causes:</strong></p>
+                        <ul style="text-align: left;">
+                            <li>Camera permission denied</li>
+                            <li>Camera in use by another app</li>
+                            <li>No camera available</li>
+                            <li>Browser doesn't support camera access</li>
+                            <li>Non-HTTPS connection (required for camera)</li>
+                        </ul>
+                    </div>
+                `;
+                
+                testBtn.textContent = 'Test Camera Access';
+            } finally {
+                testBtn.disabled = false;
+            }
+        }
+        
+        function stopCamera() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => {
+                    console.log('Stopping track:', track.kind);
+                    track.stop();
+                });
+                currentStream = null;
+            }
+            
+            const video = document.getElementById('video');
+            video.style.display = 'none';
+            video.srcObject = null;
+            
+            document.getElementById('stopBtn').disabled = true;
+            document.getElementById('result').innerHTML = '<p>Camera stopped.</p>';
+        }
+        
+        // Test on page load
+        console.log('Camera test page loaded');
+        console.log('Current URL:', window.location.href);
+        console.log('Is HTTPS:', window.location.protocol === 'https:');
+    </script>
+</body>
+</html>

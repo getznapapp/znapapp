@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Redirect Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 8px;
+        }
+        .success {
+            color: #4ade80;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .info {
+            color: #94a3b8;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .button {
+            background: #6366f1;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success">✅ Static HTML Test Working!</div>
+        <div class="info">Current URL: <span id="url"></span></div>
+        <div class="info">Camera ID: <span id="cameraId"></span></div>
+        <button class="button" onclick="testReactApp()">Test React App</button>
+        <button class="button" onclick="testJoin()">Test Join Route</button>
+    </div>
+
+    <script>
+        // Display current URL info
+        document.getElementById('url').textContent = window.location.href;
+        
+        // Extract camera ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const cameraId = urlParams.get('cameraId');
+        document.getElementById('cameraId').textContent = cameraId || 'None';
+        
+        function testReactApp() {
+            // Try to load the React app version
+            window.location.href = '/redirect?cameraId=' + (cameraId || 'test123');
+        }
+        
+        function testJoin() {
+            // Try to go directly to join
+            window.location.href = '/join/' + (cameraId || 'test123');
+        }
+        
+        console.log('=== STATIC HTML TEST ===');
+        console.log('URL:', window.location.href);
+        console.log('Camera ID:', cameraId);
+    </script>
+</body>
+</html>

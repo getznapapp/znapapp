@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Join Link</title>
+    <style>
+        body {
+            font-family: -apple-system, BlurredSystemUI, 'Segoe UI', Roboto, sans-serif;
+            background: #101014;
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: #1A1A1E;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        .button {
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .button:hover {
+            background: #5a6fd8;
+        }
+        input {
+            background: #2A2A2E;
+            border: 1px solid #3A3A3E;
+            border-radius: 8px;
+            padding: 12px;
+            color: white;
+            width: 100%;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        .test-links {
+            margin-top: 30px;
+            text-align: left;
+        }
+        .test-links h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        .test-links a {
+            display: block;
+            color: #8B9DC3;
+            text-decoration: none;
+            padding: 8px 0;
+            border-bottom: 1px solid #2A2A2E;
+        }
+        .test-links a:hover {
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">znap</div>
+        <h2>Test Join Links</h2>
+        
+        <div>
+            <h3>Create Test Link:</h3>
+            <input type="text" id="cameraId" placeholder="Enter Camera ID" value="test_camera_123">
+            <button class="button" onclick="createTestLink()">Create Join Link</button>
+        </div>
+        
+        <div class="test-links">
+            <h3>Test Links:</h3>
+            <a href="/join/test_camera_123" target="_blank">Test Camera 123</a>
+            <a href="/join/camera_1234567890_ABC123" target="_blank">Sample Camera ID</a>
+            <a href="/join/my_awesome_camera" target="_blank">My Awesome Camera</a>
+        </div>
+        
+        <div id="result" style="margin-top: 20px; padding: 15px; background: #2A2A2E; border-radius: 8px; display: none;">
+            <h4>Generated Link:</h4>
+            <p id="generatedLink" style="word-break: break-all; color: #667eea;"></p>
+            <button class="button" onclick="testLink()">Test Link</button>
+            <button class="button" onclick="copyLink()">Copy Link</button>
+        </div>
+    </div>
+
+    <script>
+        function createTestLink() {
+            const cameraId = document.getElementById('cameraId').value.trim();
+            if (!cameraId) {
+                alert('Please enter a Camera ID');
+                return;
+            }
+            
+            const joinUrl = `${window.location.origin}/join/${encodeURIComponent(cameraId)}`;
+            document.getElementById('generatedLink').textContent = joinUrl;
+            document.getElementById('result').style.display = 'block';
+            
+            // Store for other functions
+            window.currentTestLink = joinUrl;
+        }
+        
+        function testLink() {
+            if (window.currentTestLink) {
+                window.open(window.currentTestLink, '_blank');
+            }
+        }
+        
+        function copyLink() {
+            if (window.currentTestLink) {
+                navigator.clipboard.writeText(window.currentTestLink).then(() => {
+                    alert('Link copied to clipboard!');
+                }).catch(() => {
+                    alert('Failed to copy link');
+                });
+            }
+        }
+        
+        // Auto-generate a test link on page load
+        window.onload = function() {
+            createTestLink();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Join Znap Camera</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            color: #94a3b8;
+            margin-bottom: 32px;
+            line-height: 1.4;
+        }
+        
+        .button {
+            background: #6366f1;
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 8px;
+            min-width: 200px;
+            transition: background-color 0.2s;
+        }
+        
+        .button:hover {
+            background: #5855eb;
+        }
+        
+        .button-secondary {
+            background: transparent;
+            border: 1px solid #374151;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+        
+        .button-secondary:hover {
+            background: #1f2937;
+            color: white;
+        }
+        
+        .loading {
+            display: none;
+            margin: 20px 0;
+        }
+        
+        .loading-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #6366f1;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        
+        .debug {
+            margin-top: 40px;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #6b7280;
+            text-align: left;
+        }
+        
+        .debug h3 {
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Open this event in the Znap app</h1>
+        <p class="subtitle" id="subtitle">
+            Tap the button below to open the event in the Znap app.
+        </p>
+        
+        <div id="buttons">
+            <button class="button" onclick="openApp()">Open in App</button>
+            <button class="button button-secondary" onclick="openWeb()">Continue in Browser</button>
+        </div>
+        
+        <div class="loading" id="loading">
+            <p>Opening app...</p>
+            <div class="loading-dots">
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+            </div>
+        </div>
+        
+        <div class="debug">
+            <h3>Debug Info</h3>
+            <div id="debugInfo"></div>
+        </div>
+    </div>
+
+    <script>
+        // Get camera ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const cameraId = urlParams.get('cameraId');
+        
+        console.log('=== STATIC REDIRECT PAGE ===');
+        console.log('Camera ID:', cameraId);
+        console.log('Full URL:', window.location.href);
+        
+        // Update debug info
+        document.getElementById('debugInfo').innerHTML = `
+            <strong>Camera ID:</strong> ${cameraId || 'None'}<br>
+            <strong>URL:</strong> ${window.location.href}<br>
+            <strong>User Agent:</strong> ${navigator.userAgent}<br>
+            <strong>Timestamp:</strong> ${new Date().toISOString()}
+        `;
+        
+        if (!cameraId) {
+            document.getElementById('subtitle').textContent = 'This invite link is missing required information.';
+            document.getElementById('buttons').innerHTML = '<p style="color: #ef4444;">Invalid camera link</p>';
+        }
+        
+        function openApp() {
+            if (!cameraId) return;
+            
+            document.getElementById('buttons').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('subtitle').textContent = "Opening app... If it doesn't open, you'll be redirected to the web version.";
+            
+            const deepLinkUrl = `myapp://join?cameraId=${cameraId}`;
+            const fallbackUrl = `/join/${cameraId}`;
+            
+            // Try to open the app
+            const tryOpenApp = () => {
+                // Method 1: Try with iframe
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = deepLinkUrl;
+                document.body.appendChild(iframe);
+                
+                setTimeout(() => {
+                    if (document.body.contains(iframe)) {
+                        document.body.removeChild(iframe);
+                    }
+                }, 100);
+                
+                // Method 2: Try with window.location
+                setTimeout(() => {
+                    try {
+                        window.location.href = deepLinkUrl;
+                    } catch (error) {
+                        console.log('Deep link failed:', error);
+                    }
+                }, 500);
+            };
+            
+            // Set up fallback timer
+            const fallbackTimer = setTimeout(() => {
+                console.log('Falling back to web version');
+                window.location.href = fallbackUrl;
+            }, 2500);
+            
+            // Listen for page visibility change (indicates app opened)
+            const handleVisibilityChange = () => {
+                if (document.hidden) {
+                    console.log('Page became hidden, app likely opened');
+                    clearTimeout(fallbackTimer);
+                }
+            };
+            
+            const handleBlur = () => {
+                console.log('Window blurred, app likely opened');
+                clearTimeout(fallbackTimer);
+            };
+            
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+            window.addEventListener('blur', handleBlur);
+            
+            // Try to open the app
+            tryOpenApp();
+            
+            // Cleanup after timeout
+            setTimeout(() => {
+                document.removeEventListener('visibilitychange', handleVisibilityChange);
+                window.removeEventListener('blur', handleBlur);
+            }, 3000);
+        }
+        
+        function openWeb() {
+            if (!cameraId) return;
+            window.location.href = `/join/${cameraId}`;
+        }
+        
+        // Auto-redirect after 5 seconds if no interaction
+        if (cameraId) {
+            setTimeout(() => {
+                if (document.getElementById('buttons').style.display !== 'none') {
+                    console.log('Auto-redirecting to web version');
+                    openWeb();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

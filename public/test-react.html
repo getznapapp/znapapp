@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React App Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 400px;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .info {
+            font-size: 14px;
+            color: #a0a0a0;
+            margin: 8px 0;
+        }
+        .button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">React App Test</h1>
+        <div class="info">This is a static HTML test page</div>
+        <div class="info" id="url"></div>
+        <div class="info" id="params"></div>
+        <button class="button" onclick="testReactRoute()">Test /redirect Route</button>
+        <button class="button" onclick="testJoinRoute()">Test /join/test Route</button>
+    </div>
+
+    <script>
+        document.getElementById('url').textContent = 'URL: ' + window.location.href;
+        document.getElementById('params').textContent = 'Search: ' + window.location.search;
+        
+        function testReactRoute() {
+            window.location.href = '/redirect?cameraId=test123';
+        }
+        
+        function testJoinRoute() {
+            window.location.href = '/join/test123';
+        }
+    </script>
+</body>
+</html>

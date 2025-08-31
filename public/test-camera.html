@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Camera Route Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-link { 
+            display: inline-block; 
+            margin: 10px; 
+            padding: 10px 20px; 
+            background: #007bff; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 5px; 
+        }
+        .test-link:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>Camera Route Test</h1>
+    <p>Test the new /camera route with different camera IDs:</p>
+    
+    <div>
+        <a href="/camera?id=test123" class="test-link">Test Camera: test123</a>
+        <a href="/camera?id=abc456" class="test-link">Test Camera: abc456</a>
+        <a href="/camera?id=demo789" class="test-link">Test Camera: demo789</a>
+    </div>
+    
+    <h2>Current Page Info:</h2>
+    <p>URL: <span id="url"></span></p>
+    <p>Search params: <span id="params"></span></p>
+    <p>Camera ID: <span id="cameraId"></span></p>
+    
+    <h2>Test Links:</h2>
+    <p>These links should open the camera directly with the specified ID:</p>
+    <ul>
+        <li><a href="/camera?id=wedding2024">Wedding Camera</a></li>
+        <li><a href="/camera?id=birthday-party">Birthday Party</a></li>
+        <li><a href="/camera?id=vacation-photos">Vacation Photos</a></li>
+    </ul>
+    
+    <script>
+        document.getElementById('url').textContent = window.location.href;
+        document.getElementById('params').textContent = window.location.search;
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const cameraId = urlParams.get('id');
+        
+        if (cameraId) {
+            document.getElementById('cameraId').textContent = cameraId;
+            document.getElementById('cameraId').style.fontWeight = 'bold';
+            document.getElementById('cameraId').style.color = 'green';
+        } else {
+            document.getElementById('cameraId').textContent = 'None found';
+            document.getElementById('cameraId').style.color = 'red';
+        }
+    </script>
+</body>
+</html>

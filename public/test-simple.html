@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Test</title>
+</head>
+<body>
+    <h1>Simple Test Page</h1>
+    <p>If you can see this, Netlify is serving static files correctly.</p>
+    <p>Current URL: <span id="url"></span></p>
+    <p>Search params: <span id="params"></span></p>
+    
+    <script>
+        document.getElementById('url').textContent = window.location.href;
+        document.getElementById('params').textContent = window.location.search;
+        
+        // Test redirect functionality
+        const urlParams = new URLSearchParams(window.location.search);
+        const cameraId = urlParams.get('cameraId');
+        
+        if (cameraId) {
+            document.body.innerHTML += `<p><strong>Camera ID found: ${cameraId}</strong></p>`;
+            document.body.innerHTML += `<p><a href="/join/${cameraId}">Go to join page</a></p>`;
+        }
+    </script>
+</body>
+</html>

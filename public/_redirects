@@ -1,0 +1,9 @@
+# Debug and test pages
+/debug          /debug.html                   200
+/test-static    /test-redirect-simple.html    200
+/test-redirect  /test-redirect-working.html   200
+/redirect-static /redirect.html               200
+/test-final     /test-redirect-final.html     200
+
+# SPA fallback - serve the main app for all routes (including /redirect)
+/*              /index.html                   200
