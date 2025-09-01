@@ -24,9 +24,7 @@
   },
   "submit": {
     "production": {
-      "ios": {
-        "automaticRelease": false
-      }
+      "ios": {}
     }
   }
 }
